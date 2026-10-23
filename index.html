@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Simplest - Healthy Meal Management</title>
+  <meta name="app-version" content="1.0.2">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#064e3b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Simplest">
+  <link rel="icon" type="image/png" href="icons/logo.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Firebase Web SDK Compat (CD) -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+
+  <div id="app-container">
+
+    <!-- 💻 Desktop Sidebar Navigaton -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="icons/logo.png" alt="Simplest Logo" class="brand-logo-img">
+        <span class="brand-title">Simplest</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-item active" data-view="dashboard">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-view="menu">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+            <line x1="16" x2="16" y1="2" y2="6" />
+            <line x1="8" x2="8" y1="2" y2="6" />
+            <line x1="3" x2="21" y1="10" y2="10" />
+          </svg>
+          <span>Weekly Menu</span>
+        </div>
+        <div class="nav-item" data-view="contacts">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <span>Contacts</span>
+        </div>
+        <div class="nav-item" data-view="orders">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <path d="m9 14 2 2 4-4" />
+          </svg>
+          <span>Orders</span>
+        </div>
+        <div class="nav-item" data-view="kitchen">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <circle cx="5" cy="18" r="3" />
+            <circle cx="19" cy="18" r="3" />
+            <path d="M12 18H8l2-7h4l2 4h3" />
+            <path d="M13 7h-2l-1 4" />
+            <circle cx="13" cy="4" r="1.5" />
+          </svg>
+          <span>Rider Dispatch</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <svg class="svg-icon sm" viewBox="0 0 24 24">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <span class="user-email" id="user-email-display">Admin</span>
+        </div>
+        <button class="btn btn-outline btn-sm" style="color: #94a3b8; border-color: rgba(255,255,255,0.15);"
+          onclick="logoutUser()">
+          Logout
+        </button>
+      </div>
+
+      <div class="sidebar-version-bar"
+        style="padding: 0.6rem 1.25rem 0.85rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.725rem; color: #94a3b8;">
+        <span>Simplest v1.15</span>
+        <button type="button" onclick="SimplestUpdater.checkForUpdates(true)" title="Check for software updates"
+          style="background: none; border: none; color: #34d399; font-size: 0.725rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 2px 4px; border-radius: 4px;">
+          <svg style="width: 12px; height: 12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5">
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          </svg>
+          <span>Check Update</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+
+      <!-- Top Sticky Header Bar -->
+      <header class="top-header">
+        <div class="header-brand-title">
+          <img src="icons/logo.png" alt="Simplest Logo" class="mobile-header-logo">
+          <h1 class="page-title" id="main-header-title">Dashboard Overview</h1>
+        </div>
+
+        <div class="header-actions">
+          <button id="price-settings-header-btn" class="btn btn-outline btn-sm" onclick="openPriceSettingsModal()"
+            title="Meal Price Settings">
+            <svg class="svg-icon sm" viewBox="0 0 24 24">
+              <line x1="12" y1="2" x2="12" y2="22" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+            <span>Set Prices</span>
+          </button>
+
+          <button id="theme-toggle-btn" class="btn btn-outline btn-sm" onclick="toggleTheme()"
+            title="Toggle Dark/Light Theme">
+            <svg class="svg-icon sm" viewBox="0 0 24 24">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            </svg>
+            <span>Dark</span>
+          </button>
+
+          <button class="btn btn-primary btn-sm" onclick="openAddOrderModal()" title="Add New Order">
+            <svg class="svg-icon sm" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>New Order</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Body Container -->
+      <div class="content-body">
+
+        <!-- 1. VIEW: DASHBOARD -->
+        <section id="view-dashboard" class="view-section active">
+          <!-- Day Selector Toolbar -->
+          <div class="week-selector-card">
+            <div class="week-selector-header">
+              <div>
+                <div class="week-title" id="dashboard-week-title">Today's Food</div>
+                <div class="week-date-range" id="dashboard-week-range">--</div>
+              </div>
+            </div>
+            <div class="ios-segmented-nav">
+              <button type="button" class="ios-segment-btn" id="dash-seg-prev"
+                onclick="setDashboardDayOffset(-1)">&#8592; Prev</button>
+              <button type="button" class="ios-segment-btn active" id="dash-seg-current"
+                onclick="setDashboardDayOffset(0)">Today</button>
+              <button type="button" class="ios-segment-btn" id="dash-seg-next" onclick="setDashboardDayOffset(1)">Next
+                &#8594;</button>
+            </div>
+          </div>
+
+          <!-- Summary Statistics Grid (Command Center Top 4 KPIs) -->
+          <div class="command-kpi-grid" id="dashboard-kpi-grid">
+            <!-- Rendered dynamically by js/views/dashboard.js -->
+          </div>
+
+          <!-- Command Center Main Cockpit Grid (Dual-Column Desk & Responsive Stack) -->
+          <div class="command-center-grid" id="dashboard-cockpit-grid">
+            <!-- Rendered dynamically by js/views/dashboard.js -->
+          </div>
+        </section>
+
+
+        <!-- 2. VIEW: MONTHLY MENU CALENDAR -->
+        <section id="view-menu" class="view-section">
+          <!-- Month Navigation Toolbar -->
+          <div class="week-selector-card">
+            <div class="week-selector-header">
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <div class="week-title" id="menu-month-title">Monthly Menu</div>
+                <span class="badge badge-confirmed" id="menu-month-summary"
+                  style="font-size:0.775rem; padding:0.25rem 0.6rem;">-- days set</span>
+              </div>
+              <div style="display:flex; gap:0.4rem; align-items:center;">
+                <button class="btn btn-primary btn-sm" onclick="openEditMenuModal()" title="Add or Edit Menu">
+                  <svg class="svg-icon sm" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  <span>Add Menu</span>
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="openPriceSettingsModal()" title="Set Meal Prices">
+                  <svg class="svg-icon sm" viewBox="0 0 24 24">
+                    <line x1="12" y1="2" x2="12" y2="22" />
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                  <span>Set Prices</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="ios-segmented-nav">
+              <button type="button" class="ios-segment-btn" id="menu-seg-prev" onclick="setMenuMonthOffset(-1)">&#8592;
+                Prev</button>
+              <button type="button" class="ios-segment-btn active" id="menu-seg-current"
+                onclick="setMenuMonthOffset(0)">This Month</button>
+              <button type="button" class="ios-segment-btn" id="menu-seg-next" onclick="setMenuMonthOffset(1)">Next
+                &#8594;</button>
+            </div>
+          </div>
+
+          <!-- Calendar Grid -->
+          <div class="menu-calendar-wrapper">
+            <div id="menu-calendar-grid">
+              <!-- Rendered dynamically by js/views/menu.js -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- 3. VIEW: CONTACTS & DEBT MANAGEMENT -->
+        <section id="view-contacts" class="view-section">
+          <!-- Top Sub-Tab Navigation Switcher -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div class="ios-segmented-nav" style="max-width: 420px; margin-bottom: 0;">
+              <button type="button" class="ios-segment-btn active" id="subtab-btn-contacts" onclick="switchContactSubTab('contacts')">
+                👥 Contacts List
+              </button>
+              <button type="button" class="ios-segment-btn" id="subtab-btn-debt" onclick="switchContactSubTab('debt')">
+                💳 Customer Debt
+              </button>
+            </div>
+          </div>
+
+          <!-- SUBVIEW 1: CONTACTS LIST -->
+          <div id="contacts-subview-list">
+            <div class="toolbar-row">
+              <div class="search-box">
+                <span class="search-icon-pos">
+                  <svg class="svg-icon sm" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </span>
+                <input type="text" id="contact-search-input" class="search-input"
+                  placeholder="Search name, phone, address..." oninput="handleContactSearch(this.value)" />
+              </div>
+
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="openAddContactModal()">
+                  <svg class="svg-icon sm" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  <span>Add Contact</span>
+                </button>
+              </div>
+            </div>
+
+            <div id="contacts-list-container">
+              <!-- Rendered dynamically by js/views/contacts.js -->
+            </div>
+          </div>
+
+          <!-- SUBVIEW 2: CUSTOMER DEBT MANAGEMENT -->
+          <div id="contacts-subview-debt" style="display: none;">
+            <!-- 4 Top Stat KPI Cards -->
+            <div class="debt-kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+              <div class="debt-kpi-card" style="background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border: 1px solid #fecdd3; border-radius: var(--radius-lg); padding: 1.15rem 1.25rem; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.76rem; font-weight: 800; color: #be123c; text-transform: uppercase; letter-spacing: 0.04em;">Total Outstanding</span>
+                  <span style="font-size: 1.35rem;">💰</span>
+                </div>
+                <div id="debt-kpi-total-outstanding" style="font-size: 1.65rem; font-weight: 800; color: #9f1239; margin-top: 0.45rem; letter-spacing: -0.02em;">
+                  RM 0.00
+                </div>
+                <div style="font-size: 0.74rem; color: #be123c; margin-top: 0.25rem; font-weight: 600;">
+                  Total unpaid balance across all customers
+                </div>
+              </div>
+
+              <div class="debt-kpi-card" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fde68a; border-radius: var(--radius-lg); padding: 1.15rem 1.25rem; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.76rem; font-weight: 800; color: #b45309; text-transform: uppercase; letter-spacing: 0.04em;">Meal Outstanding</span>
+                  <span style="font-size: 1.35rem;">🍱</span>
+                </div>
+                <div id="debt-kpi-meal-outstanding" style="font-size: 1.65rem; font-weight: 800; color: #92400e; margin-top: 0.45rem; letter-spacing: -0.02em;">
+                  RM 0.00
+                </div>
+                <div style="font-size: 0.74rem; color: #b45309; margin-top: 0.25rem; font-weight: 600;">
+                  Unpaid food &amp; add-on costs
+                </div>
+              </div>
+
+              <div class="debt-kpi-card" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: var(--radius-lg); padding: 1.15rem 1.25rem; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.76rem; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.04em;">Rider Fee Outstanding</span>
+                  <span style="font-size: 1.35rem;">🛵</span>
+                </div>
+                <div id="debt-kpi-rider-outstanding" style="font-size: 1.65rem; font-weight: 800; color: #075985; margin-top: 0.45rem; letter-spacing: -0.02em;">
+                  RM 0.00
+                </div>
+                <div style="font-size: 0.74rem; color: #0369a1; margin-top: 0.25rem; font-weight: 600;">
+                  Unpaid delivery / rider fees
+                </div>
+              </div>
+
+              <div class="debt-kpi-card" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: var(--radius-lg); padding: 1.15rem 1.25rem; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.76rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.04em;">Customers in Debt</span>
+                  <span style="font-size: 1.35rem;">👥</span>
+                </div>
+                <div id="debt-kpi-customers-count" style="font-size: 1.65rem; font-weight: 800; color: #1e293b; margin-top: 0.45rem; letter-spacing: -0.02em;">
+                  0 Customers
+                </div>
+                <div style="font-size: 0.74rem; color: #64748b; margin-top: 0.25rem; font-weight: 600;">
+                  Count of customers with balance &gt; 0
+                </div>
+              </div>
+            </div>
+
+            <!-- Debt Filters & Search Control Bar -->
+            <div class="week-selector-card" style="margin-bottom: 1rem; padding: 0.85rem 1.15rem;">
+              <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between;">
+                <!-- Search Box -->
+                <div class="search-box" style="flex: 1; min-width: 220px; max-width: 320px;">
+                  <span class="search-icon-pos">
+                    <svg class="svg-icon sm" viewBox="0 0 24 24">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  </span>
+                  <input type="text" id="debt-search-input" class="search-input"
+                    placeholder="Search name, phone, ID..." oninput="handleDebtSearch(this.value)" />
+                </div>
+
+                <!-- Status Filter: Debt Only vs All -->
+                <div class="ios-segmented-nav" style="margin-bottom: 0;">
+                  <button type="button" class="ios-segment-btn debt-status-btn active" data-status="debt_only" onclick="setDebtStatusFilter('debt_only')">
+                    ⚠️ In Debt Only
+                  </button>
+                  <button type="button" class="ios-segment-btn debt-status-btn" data-status="all" onclick="setDebtStatusFilter('all')">
+                    All Customers
+                  </button>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="ios-segmented-nav" style="margin-bottom: 0;">
+                  <button type="button" class="ios-segment-btn debt-type-btn active" data-type="all" onclick="setDebtTypeFilter('all')">
+                    All
+                  </button>
+                  <button type="button" class="ios-segment-btn debt-type-btn" data-type="meal_debt" onclick="setDebtTypeFilter('meal_debt')">
+                    🍱 Meal Due
+                  </button>
+                  <button type="button" class="ios-segment-btn debt-type-btn" data-type="rider_debt" onclick="setDebtTypeFilter('rider_debt')">
+                    🛵 Rider Due
+                  </button>
+                </div>
+
+                <!-- Date Range Filter -->
+                <div class="ios-segmented-nav" style="margin-bottom: 0;">
+                  <button type="button" class="ios-segment-btn debt-date-btn active" data-date="all" onclick="setDebtDateFilter('all')">
+                    All Time
+                  </button>
+                  <button type="button" class="ios-segment-btn debt-date-btn" data-date="this_month" onclick="setDebtDateFilter('this_month')">
+                    This Month
+                  </button>
+                  <button type="button" class="ios-segment-btn debt-date-btn" data-date="last_month" onclick="setDebtDateFilter('last_month')">
+                    Last Month
+                  </button>
+                  <button type="button" class="ios-segment-btn debt-date-btn" data-date="custom" onclick="setDebtDateFilter('custom')">
+                    Custom Range
+                  </button>
+                </div>
+
+                <!-- Sort Dropdown -->
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <span style="font-size: 0.775rem; font-weight: 700; color: var(--text-muted);">Sort:</span>
+                  <select id="debt-sort-select" onchange="handleDebtSortChange(this.value)" class="form-control" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; width: auto; font-weight: 600;">
+                    <option value="debt_desc">Highest Debt First</option>
+                    <option value="debt_asc">Lowest Debt First</option>
+                    <option value="meal_desc">Highest Meal Debt</option>
+                    <option value="rider_desc">Highest Rider Debt</option>
+                    <option value="name_asc">Name (A-Z)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Custom Date Range Sub-Bar -->
+              <div id="debt-custom-date-box" style="display: none; align-items: center; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.65rem; border-top: 1px dashed var(--border-light); width: 100%; flex-wrap: wrap;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-main);">📅 Order Date Range:</span>
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">From:</span>
+                  <input type="date" id="debt-input-start-date" class="form-control" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; width: auto;" onchange="handleDebtCustomDateChange()" />
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">To:</span>
+                  <input type="date" id="debt-input-end-date" class="form-control" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; width: auto;" onchange="handleDebtCustomDateChange()" />
+                </div>
+                <button type="button" class="btn btn-sm btn-outline" onclick="debtCustomStartDate=''; debtCustomEndDate=''; document.getElementById('debt-input-start-date').value=''; document.getElementById('debt-input-end-date').value=''; handleDebtCustomDateChange();" style="font-size: 0.74rem; padding: 0.25rem 0.55rem;">
+                  Clear Date Filter
+                </button>
+              </div>
+            </div>
+
+            <!-- Debt Table & Responsive Cards Container -->
+            <div id="debt-table-container">
+              <!-- Rendered dynamically by js/views/debt.js -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- 4. VIEW: ORDERS -->
+        <section id="view-orders" class="view-section">
+          <!-- Orders Day / Month Selector Toolbar -->
+          <div class="week-selector-card">
+            <div class="week-selector-header">
+              <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                <div>
+                  <div class="week-title" id="orders-week-title">Orders Management</div>
+                  <div class="week-date-range" id="orders-week-range">--</div>
+                </div>
+                <!-- View Scope Switcher: Day vs Month -->
+                <div class="order-scope-nav">
+                  <button type="button" class="order-scope-btn active" id="orders-scope-day"
+                    onclick="setOrdersViewScope('day')">📅 Day</button>
+                  <button type="button" class="order-scope-btn" id="orders-scope-month"
+                    onclick="setOrdersViewScope('month')">🗓️ Month</button>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <button type="button" class="btn btn-outline btn-sm"
+                  onclick="openExportExcelModal(typeof ordersDayOffset !== 'undefined' ? ordersDayOffset : 0)"
+                  title="Export daily delivery sheet to Excel (1.xlsx)"
+                  style="display:flex; align-items:center; gap:0.35rem; font-weight:700; background:rgba(16, 185, 129, 0.12); border-color:#10b981; color:#059669; padding:0.35rem 0.75rem; border-radius:18px; cursor:pointer;">
+                  <span>📊 Export Daily Excel</span>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm"
+                  onclick="openReceiptPrinterModal(typeof ordersDayOffset !== 'undefined' ? ordersDayOffset : 0)"
+                  title="Open Print Receipts window to select and print (80mm Auto-Cut)"
+                  style="display:flex; align-items:center; gap:0.35rem; font-weight:700; background:rgba(37, 99, 235, 0.1); border-color:#2563eb; color:#1d4ed8; padding:0.35rem 0.75rem; border-radius:18px; cursor:pointer;">
+                  <span>🖨️ Print Receipts</span>
+                </button>
+                <span class="badge badge-paid" id="orders-total-weekly-count"
+                  style="font-size:0.8rem; padding:0.3rem 0.7rem;">0 Orders</span>
+              </div>
+            </div>
+
+            <!-- Day Navigation (shown in Day view) -->
+            <div class="ios-segmented-nav" id="orders-day-nav">
+              <button type="button" class="ios-segment-btn" id="orders-seg-prev"
+                onclick="setOrdersDayOffset(-1)">&#8592; Prev</button>
+              <button type="button" class="ios-segment-btn active" id="orders-seg-current"
+                onclick="setOrdersDayOffset(0)">Today</button>
+              <button type="button" class="ios-segment-btn" id="orders-seg-next" onclick="setOrdersDayOffset(1)">Next
+                &#8594;</button>
+            </div>
+
+            <!-- Month Navigation (shown in Month view) -->
+            <div class="ios-segmented-nav" id="orders-month-nav" style="display: none;">
+              <button type="button" class="ios-segment-btn" id="orders-month-prev"
+                onclick="setOrdersMonthOffset(-1)">&#8592; Prev Month</button>
+              <button type="button" class="ios-segment-btn active" id="orders-month-current"
+                onclick="setOrdersMonthOffset(0)">This Month</button>
+              <button type="button" class="ios-segment-btn" id="orders-month-next"
+                onclick="setOrdersMonthOffset(1)">Next Month &#8594;</button>
+            </div>
+          </div>
+
+          <div
+            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.65rem; font-size: 0.8rem; font-weight: 700;">
+            <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+              <span style="color: var(--text-muted);">Payment:</span>
+              <button class="filter-pill filter-payment active" data-val="All"
+                onclick="setOrderFilter('payment', 'All')">All</button>
+              <button class="filter-pill filter-payment" data-val="Paid"
+                onclick="setOrderFilter('payment', 'Paid')">Paid</button>
+              <button class="filter-pill filter-payment" data-val="Unpaid"
+                onclick="setOrderFilter('payment', 'Unpaid')">Unpaid</button>
+            </div>
+            <div>
+              <input type="text" id="orders-search-input" placeholder="🔍 Search customer, food, date..."
+                oninput="handleOrderSearchFilter(this.value)" class="form-control"
+                style="max-width: 250px; height: 32px; font-size: 0.8rem; border-radius: 16px; padding: 0.3rem 0.85rem;" />
+            </div>
+          </div>
+
+          <div id="orders-list-container">
+            <!-- Rendered dynamically by js/views/orders.js -->
+          </div>
+        </section>
+
+
+        <!-- 5. VIEW: GRAB DISPATCH HUB (formerly kitchen) -->
+        <section id="view-kitchen" class="view-section">
+          <!-- Grab Dispatch Selector Toolbar -->
+          <div class="week-selector-card">
+            <div class="week-selector-header">
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <div>
+                  <div class="week-title" id="kitchen-week-title">🛵 Rider Dispatch Hub</div>
+                  <div class="week-date-range" id="kitchen-week-range">--</div>
+                </div>
+              </div>
+              <span class="badge badge-paid" id="kitchen-total-weekly-meals"
+                style="font-size:0.8rem; padding:0.3rem 0.7rem;">0 Deliveries Today</span>
+            </div>
+
+            <div class="ios-segmented-nav">
+              <button type="button" class="ios-segment-btn" id="kitchen-seg-prev"
+                onclick="setKitchenDayOffset(-1)">&#8592; Prev</button>
+              <button type="button" class="ios-segment-btn active" id="kitchen-seg-current"
+                onclick="setKitchenDayOffset(0)">Today</button>
+              <button type="button" class="ios-segment-btn" id="kitchen-seg-next" onclick="setKitchenDayOffset(1)">Next
+                &#8594;</button>
+            </div>
+          </div>
+
+          <div class="grab-dispatch-grid" id="kitchen-cards-container" style="width: 100%;">
+            <!-- Rendered dynamically by js/views/kitchen.js -->
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- 📱 Mobile Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <div class="bottom-nav-container">
+        <div class="bottom-nav-item active" data-view="dashboard">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span>Home</span>
+        </div>
+        <div class="bottom-nav-item" data-view="contacts">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <span>Contacts</span>
+        </div>
+        <div class="bottom-nav-item" data-view="orders">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <path d="m9 14 2 2 4-4" />
+          </svg>
+          <span>Orders</span>
+        </div>
+        <div class="bottom-nav-item" data-view="menu">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+            <line x1="16" x2="16" y1="2" y2="6" />
+            <line x1="8" x2="8" y1="2" y2="6" />
+            <line x1="3" x2="21" y1="10" y2="10" />
+          </svg>
+          <span>Menu</span>
+        </div>
+        <div class="bottom-nav-item" data-view="kitchen">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <circle cx="5" cy="18" r="3" />
+            <circle cx="19" cy="18" r="3" />
+            <path d="M12 18H8l2-7h4l2 4h3" />
+            <path d="M13 7h-2l-1 4" />
+            <circle cx="13" cy="4" r="1.5" />
+          </svg>
+          <span>Riders</span>
+        </div>
+      </div>
+    </nav>
+
+  </div>
+
+
+  <!-- MODALS -->
+
+  <!-- 1. LOGIN MODAL -->
+  <div id="login-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 380px;">
+      <div class="modal-header" style="background: var(--primary-dark); color: #fff;">
+        <h3 class="modal-title" style="color: #fff;">Simplest Admin Login</h3>
+      </div>
+      <form id="login-form"
+        onsubmit="event.preventDefault(); const e=document.getElementById('login-email').value, p=document.getElementById('login-password').value; loginUser(e,p).catch(err=>document.getElementById('login-error').textContent=err.message);">
+        <div class="modal-body">
+          <div id="login-error" style="color: #ef4444; font-size: 0.8rem; font-weight: 700;"></div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="login-email" class="form-control" value="admin@simplest.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="login-password" class="form-control" value="admin123" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" style="width: 100%;">
+            Sign In
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 2. EDIT MENU MODAL -->
+  <div id="edit-menu-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Menu for <span id="menu-edit-date-display">Date</span></h3>
+        <button class="modal-close" onclick="closeEditMenuModal()">✕</button>
+      </div>
+      <form onsubmit="saveMenuSubmit(event)">
+        <div class="modal-body">
+
+          <!-- Date Selector -->
+          <div class="form-group" style="margin-bottom: 1.1rem;">
+            <label class="form-label">Menu Date *</label>
+            <input type="date" id="menu-input-date" class="form-control" onchange="handleMenuDateChange(this.value)"
+              required />
+          </div>
+
+          <!-- Day Type Selector -->
+          <div class="form-group" style="margin-bottom:1.1rem;">
+            <label class="form-label">Day Type</label>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button type="button" id="daytype-btn-normal" class="btn btn-sm daytype-btn daytype-active"
+                onclick="setMenuDayType('normal')">
+                🍱 Normal
+              </button>
+              <button type="button" id="daytype-btn-holiday" class="btn btn-sm daytype-btn"
+                onclick="setMenuDayType('holiday')" style="background:#fff7ed; border-color:#fdba74; color:#c2410c;">
+                🎉 Public Holiday
+              </button>
+              <button type="button" id="daytype-btn-closed" class="btn btn-sm daytype-btn"
+                onclick="setMenuDayType('closed')" style="background:#fef2f2; border-color:#fca5a5; color:#b91c1c;">
+                🔒 Closed
+              </button>
+            </div>
+            <input type="hidden" id="menu-input-daytype" value="normal" />
+          </div>
+
+          <!-- Food Details (hidden when PH or Closed) -->
+          <div id="menu-food-details">
+            <div class="form-group">
+              <label class="form-label">Food Name *</label>
+              <input type="text" id="menu-input-foodName" class="form-control"
+                placeholder="e.g. Grilled Chicken Rice Bowl" />
+            </div>
+
+            <!-- Google Material Style Food Photo Picker -->
+            <div class="form-group">
+              <label class="form-label">Food Photo</label>
+              <input type="file" id="menu-input-file" accept="image/*" onchange="handleMenuImageUpload(event)"
+                style="display:none;" />
+
+              <div class="material-photo-picker" id="material-photo-picker"
+                onclick="document.getElementById('menu-input-file').click()">
+                <div class="material-photo-empty" id="material-photo-empty">
+                  <div class="material-photo-icon-wrap">
+                    <svg viewBox="0 0 24 24" class="material-photo-svg">
+                      <path
+                        d="M19 7v3h-3v2h3v3h2v-3h3v-2h-3V7h-2zm-3 3V7h-1.83l-1.83-2H8.66L6.83 7H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-5h-2v5H5V9h4.05l1.83-2h4.24l1.83 2H16zM11 18c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0-8c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3z" />
+                    </svg>
+                  </div>
+                  <div class="material-photo-label">Add Photo</div>
+                  <div class="material-photo-sub">Tap or drag image to upload</div>
+                </div>
+
+                <div class="material-photo-preview-wrap" id="material-photo-preview-wrap" style="display:none;">
+                  <img id="menu-image-preview" class="material-photo-img" />
+                  <div class="material-photo-overlay">
+                    <span class="material-photo-change-btn">
+                      <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;">
+                        <path
+                          d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                      </svg>
+                      Change
+                    </span>
+                    <span class="material-photo-remove-btn" onclick="removeMenuPhoto(event)">
+                      ✕ Remove
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea id="menu-input-desc" class="form-control" rows="2"
+                placeholder="e.g. Grilled chicken with brown rice..."></textarea>
+            </div>
+
+            <!-- Meat Select (Meal Select) Toggle -->
+            <div class="form-group" style="margin-top: 0.85rem; padding: 0.75rem 0.85rem; background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 8px;">
+              <label style="display: flex; align-items: center; gap: 0.65rem; cursor: pointer; margin-bottom: 0;">
+                <input type="checkbox" id="menu-input-meat-select" style="width: 18px; height: 18px; accent-color: #e11d48;" />
+                <div>
+                  <div style="font-weight: 800; color: #9f1239; font-size: 0.88rem; display: flex; align-items: center; gap: 4px;">
+                    🥩 Enable Meat Select (Beef, Duck, Fish, Shrimp)
+                  </div>
+                  <div style="font-size: 0.75rem; color: #be123c; margin-top: 2px;">
+                    When checked, orders for this day can choose: <strong>Beef, Duck, Fish, Shrimp</strong>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Holiday / Closed Note field -->
+          <div id="menu-holiday-note-group" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">Note (optional)</label>
+              <input type="text" id="menu-input-holiday-note" class="form-control"
+                placeholder="e.g. Hari Raya Aidilfitri / Maintenance Day" />
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeEditMenuModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Menu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 3. ADD / EDIT CONTACT MODAL -->
+  <div id="contact-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="contact-modal-title">Add New Contact</h3>
+        <button class="modal-close" onclick="closeContactModal()">✕</button>
+      </div>
+      <form onsubmit="saveContactSubmit(event)">
+        <div class="modal-body">
+          <!-- Contact Role Selector -->
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">Contact Role</label>
+            <div style="display:flex; gap:0.5rem;">
+              <button type="button" id="contact-role-btn-customer" class="btn btn-sm daytype-btn daytype-active"
+                onclick="setContactRole('customer')">
+                👤 Customer
+              </button>
+              <button type="button" id="contact-role-btn-rider" class="btn btn-sm daytype-btn"
+                onclick="setContactRole('rider')" style="background:#eff6ff; border-color:#93c5fd; color:#1d4ed8;">
+                🛵 Delivery Rider
+              </button>
+            </div>
+            <input type="hidden" id="contact-input-role" value="customer" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="contact-input-name" class="form-control" placeholder="e.g. Sarah Lee" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            <input type="tel" id="contact-input-phone" class="form-control" placeholder="e.g. 012-3456789" required />
+          </div>
+
+          <!-- Address 1 & Assigned Rider 1 Section -->
+          <div
+            style="background: var(--bg-surface-secondary, #f8fafc); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.75rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+              <label class="form-label" style="font-weight: 800; color: var(--text-main); margin-bottom: 0;">
+                📍 Address 1 (Primary)
+              </label>
+              <button type="button" id="btn-show-add-address2" class="btn btn-outline btn-xs"
+                onclick="toggleContactAddress2(true)"
+                style="font-size:0.75rem; padding:0.2rem 0.55rem; font-weight:700; border-radius:6px; color:var(--primary-dark); border-color:#86efac; background:#f0fdf4; display:inline-flex; align-items:center; gap:0.25rem;">
+                + Add Address 2
+              </button>
+            </div>
+            <div class="form-group" style="margin-bottom: 0.5rem;">
+              <textarea id="contact-input-address" class="form-control" rows="2"
+                placeholder="e.g. Level 12, Tower A, Bangsar South..."></textarea>
+            </div>
+            <div class="form-group" id="contact-rider-select-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 0.775rem; font-weight: 700;">Assigned Rider for Address 1
+                (optional)</label>
+              <select id="contact-input-rider" class="form-control" style="font-size: 0.85rem;">
+                <option value="">-- No Rider Assigned --</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Address 2 & Assigned Rider 2 Section (Hidden until + is clicked) -->
+          <div id="contact-address2-group"
+            style="display: none; background: var(--bg-surface-secondary, #f8fafc); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.75rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+              <label class="form-label" style="font-weight: 800; color: var(--text-main); margin-bottom: 0;">
+                📍 Address 2 (Optional)
+              </label>
+              <button type="button" class="btn btn-outline btn-xs" onclick="toggleContactAddress2(false)"
+                style="font-size:0.725rem; padding:0.15rem 0.5rem; color:#ef4444; border-color:#fca5a5; background:#fff5f5; font-weight:700; border-radius:6px;"
+                title="Remove Address 2">
+                ✕ Remove
+              </button>
+            </div>
+            <div class="form-group" style="margin-bottom: 0.5rem;">
+              <textarea id="contact-input-address2" class="form-control" rows="2"
+                placeholder="e.g. No. 18, Jalan Damai, Petaling Jaya..."></textarea>
+            </div>
+            <div class="form-group" id="contact-rider2-select-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 0.775rem; font-weight: 700;">Assigned Rider for Address 2
+                (optional)</label>
+              <select id="contact-input-rider2" class="form-control" style="font-size: 0.85rem;">
+                <option value="">-- No Rider Assigned --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Remark</label>
+            <input type="text" id="contact-input-remark" class="form-control" placeholder="e.g. No spicy, low sodium" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeContactModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Contact</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 3.5. PACKAGE PURCHASE MODAL -->
+  <div id="package-purchase-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">💳 Package Purchase (Meal Credit)</h3>
+        <button class="modal-close" onclick="closePackagePurchaseModal()">✕</button>
+      </div>
+      <form onsubmit="savePackagePurchaseSubmit(event)">
+        <div class="modal-body">
+          <!-- 1. Customer Search / Select -->
+          <div class="form-group">
+            <label class="form-label">Customer (Search Name or Phone) *</label>
+            <div style="position: relative;">
+              <input type="text" id="pkg-input-customer-search" class="form-control"
+                placeholder="Type customer name or phone..." autocomplete="off"
+                oninput="handlePkgCustomerSearch(this.value)" onfocus="handlePkgCustomerSearch(this.value)"
+                onkeydown="handlePkgCustomerKeydown(event)" required />
+              <input type="hidden" id="pkg-input-customer-id" />
+              <div id="pkg-customer-dropdown" class="customer-search-dropdown" style="display:none;"></div>
+            </div>
+            <div id="pkg-customer-selected-info"
+              style="display:none; font-size: 0.8rem; font-weight: 700; color: var(--primary-dark); background: var(--primary-light); padding: 0.4rem 0.65rem; border-radius: 6px; margin-top: 0.35rem; border: 1px solid #a7f3d0;">
+            </div>
+          </div>
+
+          <!-- 2. Meal Credit Quantity Inputs -->
+          <div
+            style="background: var(--bg-surface-secondary, #f8fafc); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">
+              Add Meal Credits to Balance
+            </label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.775rem;">🍱 Standard (+)</label>
+                <input type="number" id="pkg-input-credit-standard" class="form-control" min="0" value="0"
+                  placeholder="e.g. 10" />
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.775rem;">🥣 Small (+)</label>
+                <input type="number" id="pkg-input-credit-small" class="form-control" min="0" value="0"
+                  placeholder="e.g. 5" />
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.775rem;">🛵 Rider Credit (+RM)</label>
+                <input type="number" step="0.01" min="0" id="pkg-input-credit-rider" class="form-control" value="0"
+                  placeholder="e.g. 50.00" />
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Package Purchase Price (RM) -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 800; color: #047857;">
+              💵 Package Purchase Price (RM) — Adds to Today's Sales *
+            </label>
+            <div style="position: relative;">
+              <span
+                style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--text-muted);">RM</span>
+              <input type="number" id="pkg-input-price" class="form-control"
+                style="padding-left: 2.8rem; font-weight: 800; font-size: 1.05rem; color: #047857;" step="0.01" min="0"
+                placeholder="120.00" required />
+            </div>
+          </div>
+
+          <!-- 4. Remark / Payment Note -->
+          <div class="form-group">
+            <label class="form-label">Remark (optional)</label>
+            <input type="text" id="pkg-input-remark" class="form-control"
+              placeholder="e.g. Paid via Online Transfer / Cash" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closePackagePurchaseModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            💳 Confirm Purchase & Add Sales
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 4. ADD ORDER MODAL -->
+  <div id="add-order-modal" class="modal-overlay">
+    <div class="modal-card order-modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="order-modal-title">Add New Order</h3>
+        <button type="button" class="modal-close" onclick="closeAddOrderModal()">✕</button>
+      </div>
+      <form class="modal-form" onsubmit="saveOrderSubmit(event)">
+        <input type="hidden" id="order-input-edit-id" value="" />
+        <div class="modal-body order-modal-body">
+
+          <!-- 1. Customer Name / Phone Search -->
+          <div class="form-group">
+            <label class="form-label">Customer (Search Name or Phone) *</label>
+            <div style="position: relative;">
+              <input type="text" id="order-input-customer-search" class="form-control"
+                placeholder="Type name or phone number..." autocomplete="off"
+                oninput="handleOrderCustomerSearch(this.value)" onfocus="handleOrderCustomerSearch(this.value)"
+                onkeydown="handleOrderCustomerKeydown(event)" />
+              <input type="hidden" id="order-input-customer" />
+              <div id="order-customer-dropdown" class="customer-search-dropdown" style="display:none;"></div>
+            </div>
+            <div id="order-customer-selected-info"
+              style="display:none; font-size: 0.8rem; font-weight: 700; color: var(--primary-dark); background: var(--primary-light); padding: 0.4rem 0.7rem; border-radius: 6px; margin-top: 0.35rem; border: 1px solid #a7f3d0;">
+            </div>
+          </div>
+
+          <!-- 1.5. Delivery Address Selector (appears when customer has 2 addresses) -->
+          <div id="order-address-selector-group" class="form-group"
+            style="display: none; background: var(--bg-surface-secondary, #f8fafc); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+              <label class="form-label" style="margin-bottom: 0; font-weight: 800; color: var(--text-main);">📍 Choose
+                Delivery Address *</label>
+              <span
+                style="font-size: 0.725rem; background: #e0f2fe; color: #0284c7; padding: 2px 7px; border-radius: 9999px; font-weight: 800;">2
+                Addresses on file</span>
+            </div>
+            <div class="order-address-options-grid">
+              <div class="order-address-card active" id="order-addr-card-1" onclick="selectOrderDeliveryAddress(1)">
+                <div class="order-addr-card-header">
+                  <div class="order-addr-radio-dot"></div>
+                  <span class="order-addr-card-title">Address 1 (Primary)</span>
+                </div>
+                <div class="order-addr-card-text" id="order-addr-text-1">--</div>
+                <div class="order-addr-card-rider" id="order-addr-rider-1">🛵 Rider: --</div>
+              </div>
+              <div class="order-address-card" id="order-addr-card-2" onclick="selectOrderDeliveryAddress(2)">
+                <div class="order-addr-card-header">
+                  <div class="order-addr-radio-dot"></div>
+                  <span class="order-addr-card-title">Address 2</span>
+                </div>
+                <div class="order-addr-card-text" id="order-addr-text-2">--</div>
+                <div class="order-addr-card-rider" id="order-addr-rider-2">🛵 Rider: --</div>
+              </div>
+            </div>
+            <input type="hidden" id="order-input-selected-address-num" value="1" />
+          </div>
+
+          <!-- 2. Meal Date 5-Day Food Image Cards Selector (Multi-Select & Week Switcher) -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.35rem;">
+              <label class="form-label" style="margin-bottom:0; font-weight: 800;">Select Meal Dates (Multi-Select) *</label>
+              
+              <!-- Week Switcher Buttons (English UI) -->
+              <div style="display: inline-flex; align-items: center; gap: 0.25rem;">
+                <div class="btn-group btn-group-sm" style="display: inline-flex; border: 1.5px solid var(--border-color); border-radius: 8px; overflow: hidden; background: var(--bg-surface);">
+                  <button type="button" id="order-week-btn-current" class="btn btn-xs btn-primary" onclick="switchOrderModalWeek(0)" style="padding: 3px 10px; font-weight: 700; font-size: 0.76rem; border-radius: 0;">This Week</button>
+                  <button type="button" id="order-week-btn-next" class="btn btn-xs btn-outline" onclick="switchOrderModalWeek(1)" style="padding: 3px 10px; font-weight: 700; font-size: 0.76rem; border-radius: 0; border-left: 1px solid var(--border-color);">Next Week</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Week Date Range Description & Food Subtitle -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; font-size: 0.75rem;">
+              <span id="order-modal-week-range-label" style="color: var(--text-muted); font-weight: 700;">Mon - Fri</span>
+              <span id="order-selected-food-title" style="font-weight: 800; color: var(--primary-accent);"></span>
+            </div>
+
+            <div id="order-date-cards-grid" class="order-date-cards-grid">
+              <!-- Rendered dynamically by js/views/orders.js -->
+            </div>
+            <input type="hidden" id="order-input-date" />
+          </div>
+
+          <!-- 3. Meal & Add-on Configuration (Supports Individual Add-ons Per Meal) -->
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+              <label class="form-label" style="margin-bottom: 0; font-weight: 800;">🍱 Meal & Add-on Configuration
+                *</label>
+              <span id="order-lbl-meals-count"
+                style="font-size: 0.75rem; font-weight: 800; color: var(--primary-accent); background: var(--primary-light); padding: 2px 8px; border-radius: 9999px;">1
+                Meal</span>
+            </div>
+
+            <div id="order-meal-items-container" class="order-meal-items-container">
+              <!-- Dynamically populated by renderOrderMealItems() in js/views/orders.js -->
+            </div>
+
+            <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; align-items: center;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="changeOrderQuantity(1)"
+                style="font-size: 0.78rem; font-weight: 700; border-radius: 6px; padding: 0.35rem 0.75rem; border-color: var(--primary-accent); color: var(--primary-dark);">
+                ➕ Add Another Meal
+              </button>
+            </div>
+
+            <!-- Meal Package Credit Deduction Option -->
+            <div id="order-meal-credit-box"
+              style="display: none; margin-top: 0.6rem; padding: 0.45rem 0.65rem; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-md); font-size: 0.8rem;">
+              <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer; margin-bottom: 0;">
+                <input type="checkbox" id="order-checkbox-use-meal-credit" onchange="updateOrderFormCalculations()"
+                  style="width: 16px; height: 16px; accent-color: #059669;" checked />
+                <span style="font-weight: 700; color: #047857;">
+                  🍱 Deduct from Meal Package (<span id="order-meal-credit-available">Bal: 0 Std</span>)
+                </span>
+              </label>
+            </div>
+            <input type="hidden" id="order-input-portion" value="Standard" />
+            <input type="hidden" id="order-input-addons" value="" />
+          </div>
+
+          <!-- 3.8. Rider Delivery Fee Section -->
+          <div class="form-group" id="order-rider-fee-section"
+            style="background: var(--bg-surface-secondary, #f8fafc); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem 0.85rem; margin-bottom: 0.85rem;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span style="font-size: 1.05rem;">🛵</span>
+                <label class="form-label" style="margin-bottom: 0; font-weight: 800;">Rider & Delivery Fee</label>
+                <span
+                  style="font-size: 0.68rem; background: #e0f2fe; color: #0284c7; padding: 1px 6px; border-radius: 9999px; font-weight: 800;">Per Delivery</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer; margin-bottom: 0; user-select: none;">
+                  <input type="checkbox" id="order-checkbox-self-collect" onchange="toggleOrderSelfCollect(this.checked)"
+                    style="width: 15px; height: 15px; accent-color: var(--primary-accent); cursor: pointer;" />
+                  <span style="font-weight: 700; font-size: 0.82rem; color: var(--text-main);">Self Collect</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                  <span style="font-weight: 800; color: var(--text-muted); font-size: 0.85rem;">RM</span>
+                  <input type="number" step="0.01" min="0" id="order-input-rider-fee" class="form-control"
+                    style="width: 85px; text-align: right; font-weight: 800; font-size: 0.95rem; padding: 0.35rem 0.55rem; color: var(--primary-dark);"
+                    value="0.00" placeholder="0.00" onfocus="this.select()" onblur="if(this.value !== '') { const v = parseFloat(this.value); if(!isNaN(v)) this.value = v.toFixed(2); } updateOrderFormCalculations();" oninput="handleOrderRiderFeeInput()" onchange="handleOrderRiderFeeInput()" />
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem;" id="order-rider-select-wrap">
+              <select id="order-select-rider" class="form-control" style="font-size: 0.825rem; padding: 0.35rem 0.6rem;"
+                onchange="handleOrderRiderSelectChange(this.value)">
+                <option value="">-- No Rider Assigned (RM 0.00) --</option>
+              </select>
+            </div>
+            <!-- Rider Credit Deduction Option -->
+            <div id="order-rider-credit-box"
+              style="display: none; margin-top: 0.45rem; padding-top: 0.45rem; border-top: 1px dashed var(--border-color); font-size: 0.8rem;">
+              <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer; margin-bottom: 0;">
+                <input type="checkbox" id="order-checkbox-use-rider-credit" onchange="updateOrderFormCalculations()"
+                  style="width: 16px; height: 16px; accent-color: var(--primary-accent);" />
+                <span style="font-weight: 700; color: #1d4ed8;">
+                  🛵 Deduct from Rider Credit (<span id="order-rider-credit-available">Bal: RM 0.00</span>)
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 4. Quantity Stepper (+/- buttons) & Total Amount (Always Side-by-Side) -->
+          <div class="order-qty-total-row">
+            <div class="form-group">
+              <label class="form-label">Quantity</label>
+              <div class="quantity-stepper">
+                <button type="button" class="stepper-btn" onclick="changeOrderQuantity(-1)">−</button>
+                <input type="number" id="order-input-quantity" class="stepper-input" min="1" value="1" readonly />
+                <button type="button" class="stepper-btn" onclick="changeOrderQuantity(1)">+</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Total Amount</label>
+              <div class="order-total-box" id="order-display-totalAmount">
+                RM 0.00
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Payment Status -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" id="order-lbl-payment-status" style="margin-bottom: 0;">Payment Status *</label>
+              <span id="order-payment-status-hint"
+                style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;"></span>
+            </div>
+            <div class="payment-radio-group">
+              <label class="payment-radio-card unpaid active" id="payment-radio-card-unpaid">
+                <input type="radio" name="orderPaymentStatus" value="Unpaid" checked
+                  onchange="selectOrderPaymentStatus('Unpaid')" />
+                <span class="payment-radio-dot"></span>
+                <span class="payment-radio-title">Unpaid</span>
+              </label>
+              <label class="payment-radio-card paid" id="payment-radio-card-paid">
+                <input type="radio" name="orderPaymentStatus" value="Paid"
+                  onchange="selectOrderPaymentStatus('Paid')" />
+                <span class="payment-radio-dot"></span>
+                <span class="payment-radio-title">Paid</span>
+              </label>
+              <label class="payment-radio-card package disabled" id="payment-radio-card-package"
+                style="opacity: 0.45; pointer-events: none;">
+                <input type="radio" name="orderPaymentStatus" value="Package"
+                  onchange="selectOrderPaymentStatus('Package')" disabled />
+                <span class="payment-radio-dot"></span>
+                <span class="payment-radio-title">Package</span>
+              </label>
+            </div>
+            <input type="hidden" id="order-input-payment" value="Unpaid" />
+          </div>
+
+          <!-- 6. Remark -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Remark</label>
+            <input type="text" id="order-input-remark" class="form-control" placeholder="e.g. No spicy, less sauce" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeAddOrderModal()">Cancel</button>
+          <button type="submit" id="order-btn-submit" class="btn btn-primary">Submit Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 5. CUSTOMER PROFILE MODAL -->
+  <div id="customer-profile-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Customer Profile</h3>
+        <button class="modal-close" onclick="closeCustomerProfileModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div
+          style="display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.85rem;">
+          <div>
+            <h2 id="profile-name" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">Customer Name
+            </h2>
+            <div style="font-size: 0.825rem; color: var(--text-muted); margin-top: 0.2rem;">
+              📞 <span id="profile-phone">--</span>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+              📍 <span id="profile-address">--</span>
+            </div>
+            <div id="profile-rider-tag"
+              style="font-size: 0.8rem; color: #1d4ed8; font-weight: 700; margin-top: 0.2rem; display: none;">
+            </div>
+            <div id="profile-address2-row"
+              style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; display: none;">
+              📍2: <span id="profile-address2">--</span>
+            </div>
+            <div id="profile-rider2-tag"
+              style="font-size: 0.8rem; color: #1d4ed8; font-weight: 700; margin-top: 0.2rem; display: none;">
+            </div>
+            <div style="font-size: 0.775rem; color: #d97706; font-weight: 700; margin-top: 0.2rem;">
+              Remark: <span id="profile-remark">--</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openAddOrderForCustomer(viewingProfileContactId)">
+            + Order
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.65rem; margin-top: 0.85rem;">
+          <div
+            style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem; text-align: center;">
+            <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted);">TOTAL ORDERS</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-main);" id="profile-stat-orders">0</div>
+          </div>
+          <div
+            style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem; text-align: center;">
+            <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted);">TOTAL MEALS</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark);" id="profile-stat-meals">0
+            </div>
+          </div>
+          <div
+            style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem; text-align: center;">
+            <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted);">TOTAL SPENT</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary-accent);" id="profile-stat-spent">RM
+              0.00</div>
+          </div>
+        </div>
+
+        <!-- Meal Credit Card in Profile -->
+        <div
+          style="background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%); border: 1px solid #a7f3d0; border-radius: var(--radius-md); padding: 0.75rem 0.85rem; margin-top: 0.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <div style="font-size: 1.35rem;">💳</div>
+            <div>
+              <div
+                style="font-size: 0.725rem; font-weight: 800; color: #047857; text-transform: uppercase; letter-spacing: 0.03em;">
+                Meal Credit Balance</div>
+              <div
+                style="display: flex; gap: 0.75rem; margin-top: 0.15rem; font-size: 0.85rem; font-weight: 700; flex-wrap: wrap;">
+                <span style="color: #065f46;">🍱 Standard: <strong id="profile-credit-standard"
+                    style="font-size: 1rem; color: #047857;">0</strong></span>
+                <span style="color: #065f46;">🥣 Small: <strong id="profile-credit-small"
+                    style="font-size: 1rem; color: #047857;">0</strong></span>
+                <span style="color: #1e40af;">🛵 Rider Credit: <strong style="font-size: 1rem; color: #2563eb;">RM <span
+                      id="profile-credit-rider">0.00</span></strong></span>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="openEditMealCreditModal()"
+              style="border-color: #059669; color: #059669; font-weight: 700; background: #ffffff;">
+              ✏️ Edit Credit
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openPackagePurchaseModal()">
+              + Package
+            </button>
+          </div>
+        </div>
+
+        <!-- Customer Debt Status Card in Profile -->
+        <div id="profile-debt-summary-card"
+          style="background: linear-gradient(135deg, #fff1f2 0%, #fff5f5 100%); border: 1px solid #fecdd3; border-radius: var(--radius-md); padding: 0.75rem 0.85rem; margin-top: 0.65rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <div style="font-size: 1.35rem;">⚠️</div>
+            <div>
+              <div
+                style="font-size: 0.725rem; font-weight: 800; color: #be123c; text-transform: uppercase; letter-spacing: 0.03em;">
+                Outstanding Debt Balance</div>
+              <div
+                style="display: flex; gap: 0.75rem; margin-top: 0.15rem; font-size: 0.85rem; font-weight: 700; flex-wrap: wrap;">
+                <span style="color: #9f1239;">Total Due: <strong id="profile-debt-total"
+                    style="font-size: 1rem; color: #be123c;">RM 0.00</strong></span>
+                <span style="color: #92400e; font-size: 0.8rem;">🍱 Meal: <span id="profile-debt-meal">RM 0.00</span></span>
+                <span style="color: #0369a1; font-size: 0.8rem;">🛵 Rider: <span id="profile-debt-rider">RM 0.00</span></span>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.4rem;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="closeCustomerProfileModal(); openCustomerDebtHistoryModal(viewingProfileContactId);"
+              style="border-color: #cbd5e1; color: var(--text-main); font-weight: 700; background: #ffffff;">
+              📜 History
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="closeCustomerProfileModal(); openRecordRepaymentModal(viewingProfileContactId);"
+              style="background: #059669; border-color: #059669; font-weight: 800;">
+              💳 Repay
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabs for Order History vs Credit History -->
+        <div
+          style="display: flex; border-bottom: 2px solid var(--border-color); margin-top: 1rem; margin-bottom: 0.5rem; gap: 1rem;">
+          <button id="tab-btn-orders" type="button" onclick="switchProfileTab('orders')"
+            style="background: none; border: none; padding: 0.4rem 0.2rem; font-size: 0.875rem; font-weight: 800; color: var(--primary-dark); border-bottom: 2px solid var(--primary-dark); cursor: pointer; margin-bottom: -2px;">
+            📦 Order History
+          </button>
+          <button id="tab-btn-credits" type="button" onclick="switchProfileTab('credits')"
+            style="background: none; border: none; padding: 0.4rem 0.2rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); cursor: pointer; margin-bottom: -2px;">
+            📜 Credit History & Remarks
+          </button>
+        </div>
+
+        <div id="profile-tab-orders" style="max-height: 300px; overflow-y: auto;">
+          <div id="profile-order-history"></div>
+        </div>
+
+        <div id="profile-tab-credits" style="max-height: 300px; overflow-y: auto; display: none;">
+          <div id="profile-credit-history"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCustomerProfileModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 5.5. EDIT MEAL CREDIT MODAL -->
+  <div id="edit-meal-credit-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Edit Meal Credit Balance</h3>
+        <button class="modal-close" onclick="closeEditMealCreditModal()">✕</button>
+      </div>
+      <form onsubmit="saveEditMealCreditSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="edit-credit-contact-id" />
+
+          <div
+            style="font-size: 0.875rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.85rem; padding: 0.5rem 0.75rem; background: var(--bg-main); border-radius: 6px; border: 1px solid var(--border-color);">
+            Customer: <span id="edit-credit-customer-name"
+              style="color: var(--primary-dark); font-weight: 800;">--</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 0.775rem;">🍱 Standard</label>
+              <input type="number" id="edit-credit-input-standard" class="form-control" min="0" required />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 0.775rem;">🥣 Small</label>
+              <input type="number" id="edit-credit-input-small" class="form-control" min="0" required />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 0.775rem;">🛵 Rider Credit (RM)</label>
+              <input type="number" step="0.01" min="0" id="edit-credit-input-rider" class="form-control" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Adjustment Remark / Reason *</label>
+            <input type="text" id="edit-credit-input-remark" class="form-control"
+              placeholder="e.g. Refunded 2 credits, Bonus adjustment..." required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeEditMealCreditModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Credit Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 6. MEAL PRICE SETTINGS MODAL -->
+  <div id="price-settings-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Price Settings</h3>
+        <button type="button" class="modal-close" onclick="closePriceSettingsModal()">✕</button>
+      </div>
+      <form onsubmit="savePriceSettingsSubmit(event)">
+        <div class="modal-body">
+          <!-- Segmented Tab Nav: Food vs Rider -->
+          <div class="ios-segmented-nav" style="margin-bottom: 1rem; width: 100%;">
+            <button type="button" class="ios-segment-btn active" id="price-tab-btn-food"
+              onclick="switchPriceSettingsTab('food')">
+              🍱 Food Pricing
+            </button>
+            <button type="button" class="ios-segment-btn" id="price-tab-btn-rider"
+              onclick="switchPriceSettingsTab('rider')">
+              🛵 Rider Fee
+            </button>
+          </div>
+
+          <!-- TAB 1: FOOD PRICING -->
+          <div id="price-tab-food">
+            <p style="font-size: 0.825rem; color: var(--text-muted); margin-bottom: 1.15rem; line-height: 1.45;">
+              Uniform meal pricing across all weekdays, available in <strong>Standard</strong> and
+              <strong>Small</strong>
+              portions. Changes are applied automatically to menus and ordering.
+            </p>
+
+            <div class="form-group">
+              <label class="form-label">🍱 Standard Portion Price (RM) *</label>
+              <div style="position: relative;">
+                <span
+                  style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--text-muted);">RM</span>
+                <input type="number" step="0.01" min="0" id="pricing-input-standard" class="form-control" required
+                  placeholder="12.00" style="padding-left: 2.75rem; font-size: 1.05rem; font-weight: 700;" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">🥣 Small Portion Price (RM) *</label>
+              <div style="position: relative;">
+                <span
+                  style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--text-muted);">RM</span>
+                <input type="number" step="0.01" min="0" id="pricing-input-small" class="form-control" required
+                  placeholder="9.00" style="padding-left: 2.75rem; font-size: 1.05rem; font-weight: 700;" />
+              </div>
+            </div>
+
+            <!-- Add On Pricing Section -->
+            <div style="border-top: 1px dashed var(--border-color); padding-top: 0.85rem; margin-top: 0.25rem;">
+              <div
+                style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.6rem;">
+                ➕ Add On Prices (per item)</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" style="font-size:0.75rem;">🥩 Protein</label>
+                  <div style="position: relative;">
+                    <span
+                      style="position: absolute; left: 0.5rem; top: 50%; transform: translateY(-50%); font-weight: 700; font-size:0.75rem; color: var(--text-muted);">RM</span>
+                    <input type="number" step="0.01" min="0" id="pricing-input-protein" class="form-control" required
+                      placeholder="2.00" style="padding-left: 2.1rem; font-size: 0.9rem; font-weight: 700;" />
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" style="font-size:0.75rem;">🥦 Vege</label>
+                  <div style="position: relative;">
+                    <span
+                      style="position: absolute; left: 0.5rem; top: 50%; transform: translateY(-50%); font-weight: 700; font-size:0.75rem; color: var(--text-muted);">RM</span>
+                    <input type="number" step="0.01" min="0" id="pricing-input-vege" class="form-control" required
+                      placeholder="1.50" style="padding-left: 2.1rem; font-size: 0.9rem; font-weight: 700;" />
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label class="form-label" style="font-size:0.75rem;">🍚 Rice</label>
+                  <div style="position: relative;">
+                    <span
+                      style="position: absolute; left: 0.5rem; top: 50%; transform: translateY(-50%); font-weight: 700; font-size:0.75rem; color: var(--text-muted);">RM</span>
+                    <input type="number" step="0.01" min="0" id="pricing-input-rice" class="form-control" required
+                      placeholder="1.00" style="padding-left: 2.1rem; font-size: 0.9rem; font-weight: 700;" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: RIDER PRICING -->
+          <div id="price-tab-rider" style="display: none;">
+            <p style="font-size: 0.825rem; color: var(--text-muted); margin-bottom: 0.85rem; line-height: 1.45;">
+              Configure delivery fees per rider. When creating an order, assigning a rider will automatically load their
+              fee.
+            </p>
+
+            <div class="form-group"
+              style="background: var(--bg-surface-secondary, #f8fafc); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem 0.75rem; margin-bottom: 0.85rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <label class="form-label" style="margin-bottom:0.1rem; font-weight:800;">🛵 Default Delivery Fee
+                    (RM)</label>
+                  <div style="font-size:0.725rem; color:var(--text-muted);">Fallback fee when rider has no specific rate
+                  </div>
+                </div>
+                <div style="position: relative; width: 100px;">
+                  <span
+                    style="position: absolute; left: 0.6rem; top: 50%; transform: translateY(-50%); font-weight: 800; font-size: 0.8rem; color: var(--text-muted);">RM</span>
+                  <input type="number" step="0.01" min="0" id="pricing-input-default-rider" class="form-control"
+                    placeholder="0.00" onfocus="this.select()"
+                    style="padding-left: 2.2rem; font-size: 0.95rem; font-weight: 700; text-align: right;" />
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="font-size: 0.775rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.45rem;">
+              🛵 Individual Rider Rates
+            </div>
+            <div id="pricing-riders-list" style="max-height: 220px; overflow-y: auto; padding-right: 2px;">
+              <!-- Rendered dynamically by js/views/menu.js -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closePriceSettingsModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Prices</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Clean Circular Checkmark Animation Overlay -->
+  <div id="clean-checkmark-overlay" class="clean-checkmark-overlay">
+    <div class="clean-checkmark-box">
+      <svg class="clean-checkmark-svg" viewBox="0 0 52 52">
+        <circle class="clean-checkmark-circle" cx="26" cy="26" r="24" fill="none" />
+        <path class="clean-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+      </svg>
+      <div class="clean-checkmark-text" id="clean-checkmark-text">Success</div>
+    </div>
+  </div>
+
+  <!-- Google Material UI Floating Toast / Snackbar -->
+  <div id="material-snackbar" class="material-snackbar">
+    <div class="material-snackbar-icon" id="material-snackbar-icon">⚠️</div>
+    <div class="material-snackbar-text" id="material-snackbar-text">Notification message</div>
+    <button type="button" class="material-snackbar-close" onclick="hideMaterialToast()">✕</button>
+  </div>
+
+  <!-- Google Material UI Confirmation Dialog Modal -->
+  <div id="material-confirm-modal" class="modal-overlay">
+    <div class="modal-card material-confirm-card"
+      style="max-width: 420px; padding: 0; overflow: hidden; border-radius: 16px;">
+      <div style="padding: 1.35rem 1.25rem 0.85rem 1.25rem; display: flex; align-items: flex-start; gap: 0.85rem;">
+        <div id="material-confirm-icon-wrap"
+          style="width: 44px; height: 44px; border-radius: 50%; background: #fef2f2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+          🗑️
+        </div>
+        <div>
+          <h3 id="material-confirm-title"
+            style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem;">Confirm
+            Action</h3>
+          <p id="material-confirm-message"
+            style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin: 0;">Are you sure you want to
+            proceed?</p>
+        </div>
+      </div>
+      <div
+        style="padding: 0.85rem 1.25rem; background: var(--bg-surface); display: flex; align-items: center; justify-content: flex-end; gap: 0.65rem; border-top: 1px solid var(--border-light);">
+        <button type="button" class="btn btn-outline btn-sm" id="material-confirm-cancel-btn"
+          style="padding: 0.45rem 1rem; border-radius: 20px;">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="material-confirm-action-btn"
+          style="padding: 0.45rem 1rem; border-radius: 20px; background: #ef4444; border-color: #ef4444;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. EXCEL TEMPLATE EXPORT & PRINT MODAL -->
+  <div id="export-excel-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.25rem;">📊</span>
+          <h3 class="modal-title">Export Daily Delivery Sheet (Excel)</h3>
+        </div>
+        <button type="button" class="modal-close" onclick="closeExportExcelModal()">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1rem 1.25rem;">
+        <!-- Day Navigator -->
+        <div
+          style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; background: var(--bg-surface); padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-light);">
+          <button type="button" class="btn btn-outline btn-sm" onclick="setExportExcelDayOffset(-1)"
+            style="padding: 0.3rem 0.75rem;">
+            ← Prev Day
+          </button>
+          <div style="text-align: center;">
+            <div id="export-excel-week-range" style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">
+              Today
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 1px;">Auto-fills into 1.xlsx template
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="setExportExcelDayOffset(1)"
+            style="padding: 0.3rem 0.75rem;">
+            Next Day →
+          </button>
+        </div>
+
+        <!-- Daily summary & preview table -->
+        <div id="export-excel-days-summary">
+          <!-- Dynamically populated by excelExporter.js -->
+        </div>
+
+        <div
+          style="margin-top: 0.85rem; padding: 0.65rem 0.85rem; background: var(--bg-surface); border-radius: 8px; border: 1px dashed var(--border-color); font-size: 0.76rem; color: var(--text-muted); line-height: 1.45;">
+          💡 <strong>Auto-Fill Rules</strong>: Customer orders for this date are auto-filled into the matching day sheet
+          in <code>1.xlsx</code>. Multiple orders by the same customer on this day are combined into a single row (400
+          for Small, ST for Standard) with address and special remarks. Row 61 formulas auto-calculate total meals.
+        </div>
+      </div>
+      <div class="modal-footer"
+        style="display: flex; gap: 0.65rem; justify-content: flex-end; padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-light); background: var(--bg-surface); flex-wrap: wrap;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="printDailyOrdersFromModal()"
+          style="display: flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.9rem;" title="Print A4 Summary Table">
+          <span>📄 Print Summary (A4)</span>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="exportDailyOrdersToExcel()"
+          style="display: flex; align-items: center; gap: 0.35rem; background: #059669; border-color: #059669; padding: 0.45rem 1rem;">
+          <span>📊 Download Excel (.xlsx)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. DEDICATED THERMAL RECEIPT PRINTER LARGE MODAL -->
+  <div id="receipt-printer-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 860px; width: 94vw;">
+      <div class="modal-header" style="padding: 1rem 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.45rem;">🖨️</span>
+          <div>
+            <h3 class="modal-title" style="margin: 0; font-size: 1.15rem; font-weight: 800;">Print Receipts (80mm)</h3>
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
+              Select orders to print with auto-cut for POS-MAC CP-Q3
+            </div>
+          </div>
+        </div>
+        <button type="button" class="modal-close" onclick="closeReceiptPrinterModal()">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 1rem 1.25rem;">
+        <!-- Day Navigator -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; background: var(--bg-surface); padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-light);">
+          <button type="button" class="btn btn-outline btn-sm" onclick="setReceiptDayOffset(-1)" style="padding: 0.3rem 0.75rem;">
+            ← Prev Day
+          </button>
+          <div style="text-align: center;">
+            <div id="receipt-modal-date-title" style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">
+              Today
+            </div>
+            <div id="receipt-modal-date-sub" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 1px;">
+              --
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="setReceiptDayOffset(1)" style="padding: 0.3rem 0.75rem;">
+            Next Day →
+          </button>
+        </div>
+
+        <!-- Toolbar: Select Actions, Rider Filter, Search -->
+        <div style="display: flex; gap: 0.5rem; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; flex-wrap: wrap;">
+          <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="toggleAllReceiptsSelection(true)" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 700;">
+              ✓ Select All
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="toggleAllReceiptsSelection(false)" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 700;">
+              ✕ Deselect All
+            </button>
+            <div style="display: flex; align-items: center; gap: 0.3rem;">
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Rider:</span>
+              <select id="receipt-rider-filter-select" onchange="handleReceiptRiderFilterChange(this.value)"
+                style="padding: 0.32rem 0.65rem; font-size: 0.76rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-main); font-weight: 600;">
+                <option value="All">All Riders</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="flex: 1; min-width: 180px; max-width: 280px;">
+            <input type="text" id="receipt-modal-search" placeholder="🔍 Search customer, phone, address..."
+              oninput="handleReceiptSearchInput(this.value)"
+              style="width: 100%; padding: 0.38rem 0.65rem; font-size: 0.76rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-main);">
+          </div>
+        </div>
+
+        <!-- Large Customer Listing -->
+        <div id="receipt-modal-list-container" style="max-height: 420px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px;">
+          <!-- Dynamically populated by receiptPrinter.js -->
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; gap: 0.75rem; justify-content: space-between; align-items: center; padding: 0.85rem 1.25rem; border-top: 1px solid var(--border-light); background: var(--bg-surface); flex-wrap: wrap;">
+        <div id="receipt-modal-selected-summary" style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
+          Selected: 0 Orders
+        </div>
+        <div style="display: flex; gap: 0.65rem; align-items: center;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeReceiptPrinterModal()" style="padding: 0.45rem 1rem;">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-modal-print-selected" onclick="printSelectedReceiptsFromModal()"
+            style="display: flex; align-items: center; gap: 0.4rem; padding: 0.48rem 1.25rem; background: #2563eb; border-color: #2563eb; font-weight: 800; font-size: 0.85rem; border-radius: 6px;">
+            <span>🖨️ Print Selected (<span id="receipt-footer-count">0</span>)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. CUSTOMER DEBT REPAYMENT MODAL -->
+  <div id="debt-repayment-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">💳 Record Customer Repayment</h3>
+        <button type="button" class="modal-close" onclick="closeRecordRepaymentModal()">✕</button>
+      </div>
+      <form onsubmit="submitRecordRepayment(event)">
+        <div class="modal-body">
+          <!-- Customer Info & Current Outstanding Balance Bar -->
+          <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem 0.9rem; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+              <div>
+                <div style="font-size: 1rem; font-weight: 800; color: var(--text-main);" id="repay-customer-name">--</div>
+                <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">
+                  📞 <span id="repay-customer-phone">--</span> • ID: <span id="repay-customer-id" style="font-family: monospace;">--</span>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #be123c; text-transform: uppercase;">Total Due</div>
+                <div style="font-size: 1.15rem; font-weight: 800; color: #be123c;" id="repay-bal-total">RM 0.00</div>
+              </div>
+            </div>
+
+            <!-- Current Balances Breakdown -->
+            <div style="display: flex; gap: 0.85rem; margin-top: 0.55rem; padding-top: 0.5rem; border-top: 1px dashed var(--border-color); font-size: 0.8rem; flex-wrap: wrap;">
+              <span style="color: #92400e;">🍱 Meal Balance: <strong id="repay-bal-meal">RM 0.00</strong></span>
+              <span style="color: #0369a1;">🛵 Rider Balance: <strong id="repay-bal-rider">RM 0.00</strong></span>
+            </div>
+          </div>
+
+          <!-- Repayment Type Switcher -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 700;">Repayment Type *</label>
+            <div class="ios-segmented-nav" style="width: 100%; margin-bottom: 0.35rem;">
+              <button type="button" class="ios-segment-btn" id="repay-type-btn-meal" onclick="setRepaymentType('meal')">
+                🍱 Meal Only
+              </button>
+              <button type="button" class="ios-segment-btn" id="repay-type-btn-rider" onclick="setRepaymentType('rider')">
+                🛵 Rider Fee Only
+              </button>
+              <button type="button" class="ios-segment-btn active" id="repay-type-btn-combined" onclick="setRepaymentType('combined')">
+                🍱+🛵 Combined
+              </button>
+            </div>
+            <input type="hidden" id="repay-input-type" value="combined" />
+          </div>
+
+          <!-- Meal Repayment Amount Input Group -->
+          <div id="repay-group-meal" class="form-group" style="margin-bottom: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" style="margin-bottom: 0;">🍱 Meal Amount to Pay (RM) *</label>
+              <button type="button" class="btn btn-sm btn-outline" onclick="quickFillRepayment('meal')" style="font-size: 0.725rem; padding: 0.15rem 0.5rem;">
+                Pay Full Meal
+              </button>
+            </div>
+            <input type="number" step="0.01" min="0" id="repay-input-meal-amount" class="form-control" placeholder="0.00" oninput="updateRepaymentTotalSummary()" />
+          </div>
+
+          <!-- Rider Fee Repayment Amount Input Group -->
+          <div id="repay-group-rider" class="form-group" style="margin-bottom: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" style="margin-bottom: 0;">🛵 Rider Fee Amount to Pay (RM) *</label>
+              <button type="button" class="btn btn-sm btn-outline" onclick="quickFillRepayment('rider')" style="font-size: 0.725rem; padding: 0.15rem 0.5rem;">
+                Pay Full Rider
+              </button>
+            </div>
+            <input type="number" step="0.01" min="0" id="repay-input-rider-amount" class="form-control" placeholder="0.00" oninput="updateRepaymentTotalSummary()" />
+          </div>
+
+          <!-- Quick Fill Combined Button -->
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 0.75rem;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="quickFillRepayment('both')" style="font-size: 0.75rem; color: var(--primary-dark); font-weight: 700;">
+              ⚡ Fill Full Outstanding Balance
+            </button>
+          </div>
+
+          <!-- Total Repayment Preview Summary Banner -->
+          <div style="background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%); border: 1px solid #a7f3d0; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.85rem; font-weight: 700; color: #047857;">Total Payment to Record:</span>
+            <span style="font-size: 1.25rem; font-weight: 800; color: #047857;" id="repay-summary-total">RM 0.00</span>
+          </div>
+
+          <!-- Payment Date & Method -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Payment Date *</label>
+              <input type="date" id="repay-input-date" class="form-control" required />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Payment Method *</label>
+              <select id="repay-input-method" class="form-control" required>
+                <option value="Bank Transfer">Bank Transfer (Maybank / CIMB / Public)</option>
+                <option value="DuitNow QR">DuitNow QR</option>
+                <option value="Touch 'n Go eWallet">Touch 'n Go eWallet</option>
+                <option value="Cash">Cash (现金)</option>
+                <option value="Credit Card">Credit / Debit Card</option>
+                <option value="Cheque">Cheque</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Remark / Reference -->
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">Remark / Payment Reference Note</label>
+            <input type="text" id="repay-input-remark" class="form-control" placeholder="e.g. Maybank ref 987654, TNG receipt screenshot verified..." />
+          </div>
+
+          <!-- Operator Info -->
+          <div style="font-size: 0.74rem; color: var(--text-muted); background: var(--bg-main); padding: 0.4rem 0.65rem; border-radius: 5px;">
+            👤 Operator: <strong id="repay-admin-display" style="color: var(--text-main);">Admin</strong>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeRecordRepaymentModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-repayment" style="font-weight: 800; background: #059669; border-color: #059669;">
+            Save Repayment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 8. CUSTOMER DEBT & ORDER HISTORY MODAL -->
+  <div id="customer-debt-history-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 class="modal-title">📜 Customer Debt &amp; Order History</h3>
+        <button type="button" class="modal-close" onclick="closeCustomerDebtHistoryModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Customer Top Info Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h2 id="history-modal-customer-name" style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">Customer Name</h2>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+              📞 <span id="history-modal-customer-phone">--</span> • 📍 <span id="history-modal-customer-address">--</span>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="btn btn-primary btn-sm" id="history-btn-quick-repay" style="background: #059669; border-color: #059669; font-weight: 800;">
+              💳 Record Payment
+            </button>
+          </div>
+        </div>
+
+        <!-- 3-Box Financial Breakdown -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.65rem; margin-top: 0.85rem;">
+          <!-- Meal -->
+          <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem;">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #b45309; text-transform: uppercase;">🍱 MEAL TOTAL</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Cost: <span id="history-stat-meal-cost">RM 0.00</span></div>
+            <div style="font-size: 0.78rem; color: #059669; font-weight: 600;">Paid: <span id="history-stat-meal-paid">RM 0.00</span></div>
+            <div style="font-size: 0.95rem; font-weight: 800; color: #92400e; margin-top: 2px;">Due: <span id="history-stat-meal-due">RM 0.00</span></div>
+          </div>
+
+          <!-- Rider -->
+          <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.65rem;">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #0369a1; text-transform: uppercase;">🛵 RIDER TOTAL</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Cost: <span id="history-stat-rider-cost">RM 0.00</span></div>
+            <div style="font-size: 0.78rem; color: #059669; font-weight: 600;">Paid: <span id="history-stat-rider-paid">RM 0.00</span></div>
+            <div style="font-size: 0.95rem; font-weight: 800; color: #075985; margin-top: 2px;">Due: <span id="history-stat-rider-due">RM 0.00</span></div>
+          </div>
+
+          <!-- Total Balance -->
+          <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-md); padding: 0.65rem;">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #be123c; text-transform: uppercase;">💰 NET OUTSTANDING</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Cost: <span id="history-stat-total-cost">RM 0.00</span></div>
+            <div style="font-size: 0.78rem; color: #059669; font-weight: 600;">Paid: <span id="history-stat-total-paid">RM 0.00</span></div>
+            <div style="font-size: 1.05rem; font-weight: 800; color: #be123c; margin-top: 2px;">Due: <span id="history-stat-total-due">RM 0.00</span></div>
+          </div>
+        </div>
+
+        <!-- Segmented Tab Nav: Orders vs Repayments -->
+        <div style="display: flex; border-bottom: 2px solid var(--border-color); margin-top: 1rem; margin-bottom: 0.65rem; gap: 1rem;">
+          <button id="history-tab-btn-orders" type="button" onclick="switchDebtHistoryTab('orders')"
+            style="background: none; border: none; padding: 0.4rem 0.2rem; font-size: 0.875rem; font-weight: 800; color: var(--primary-dark); border-bottom: 2px solid var(--primary-dark); cursor: pointer; margin-bottom: -2px;">
+            📦 Orders Breakdown
+          </button>
+          <button id="history-tab-btn-payments" type="button" onclick="switchDebtHistoryTab('payments')"
+            style="background: none; border: none; padding: 0.4rem 0.2rem; font-size: 0.875rem; font-weight: 700; color: var(--text-muted); cursor: pointer; margin-bottom: -2px;">
+            💳 Repayment History
+          </button>
+        </div>
+
+        <!-- Tab 1: Orders List -->
+        <div id="history-tab-pane-orders" style="max-height: 380px; overflow-y: auto;">
+          <div id="history-orders-list"></div>
+        </div>
+
+        <!-- Tab 2: Payments List -->
+        <div id="history-tab-pane-payments" style="max-height: 380px; overflow-y: auto; display: none;">
+          <div id="history-payments-list"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeCustomerDebtHistoryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <!-- js/exceljs.min.js (~950 KB) is loaded on demand by excelExporter.js
+       instead of blocking first paint on phones. -->
+  <script src="js/utils/excelExporter.js"></script>
+  <script src="js/utils/receiptPrinter.js"></script>
+  <script src="js/utils/formatters.js"></script>
+  <script src="js/utils/imageCompressor.js"></script>
+  <script src="js/utils/whatsapp.js"></script>
+  <script src="js/utils/updater.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/db.js"></script>
+
+  <script src="js/views/dashboard.js"></script>
+  <script src="js/views/menu.js"></script>
+  <script src="js/views/debt.js"></script>
+  <script src="js/views/contacts.js"></script>
+  <script src="js/views/orders.js"></script>
+  <script src="js/views/kitchen.js"></script>
+
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,429 @@
+/* Simplest - Responsive Rules & Zero Overflow Enforcement */
+
+/* Universal Overflow Lock */
+html, body, #app-container, .main-wrapper {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* ═══════════════════════════════════════
+   TABLET (601px – 1024px)
+═══════════════════════════════════════ */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 200px;
+  }
+
+  .content-body {
+    padding: 1.25rem 1.25rem 2.5rem 1.25rem;
+  }
+
+  .daily-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* ═══════════════════════════════════════
+   MOBILE (≤600px)
+═══════════════════════════════════════ */
+@media (max-width: 600px) {
+
+  /* ── Sidebar off, bottom nav on ── */
+  .sidebar {
+    display: none !important;
+  }
+
+  .bottom-nav {
+    display: block !important;
+  }
+
+  /* ── Main wrapper ── */
+  .main-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-bottom: calc(var(--bottom-nav-height) + 1rem);
+  }
+
+  /* ── Top header ── */
+  .top-header {
+    padding: 0 1rem;
+    height: 54px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+
+  .mobile-header-logo {
+    display: block !important;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+
+  .page-title {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    /* Long titles must shrink, not push the action buttons off-screen */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .header-brand-title {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .header-actions {
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  /* ── Content body ── */
+  .content-body {
+    padding: 0.85rem 0.75rem 2rem 0.75rem;
+  }
+
+  /* ── Bottom nav: polished active state ── */
+  .bottom-nav {
+    height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  }
+
+  .bottom-nav-container {
+    padding: 0 0.25rem;
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    gap: 4px;
+    border-radius: 10px;
+    padding: 0.4rem 0.25rem;
+    font-size: 0.68rem;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .bottom-nav-item.active {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border-radius: 10px;
+  }
+
+  .bottom-nav-item.active .svg-icon {
+    stroke: var(--primary-accent);
+  }
+
+  .bottom-nav-item .svg-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* ── Dashboard stats: 3-col compact row on mobile ── */
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .stat-card {
+    padding: 0.65rem 0.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
+
+  /* ── Daily cards: single column ── */
+  .daily-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  /* ── Table / card switch ── */
+  .desktop-table-view {
+    display: none !important;
+  }
+
+  .mobile-card-list {
+    display: flex !important;
+  }
+
+  /* ── Week/month selector card (Mobile iOS Segmented Style) ── */
+  .week-selector-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+  }
+
+  .week-selector-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .ios-segmented-nav {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    margin-top: 0.15rem;
+  }
+
+  .ios-segment-btn {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.78rem;
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+
+  .week-nav-group {
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.3rem;
+  }
+
+  /* ── Modals: bottom sheet style ── */
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .modal-card {
+    max-width: 100% !important;
+    max-height: 92vh !important;
+    border-radius: 20px 20px 0 0 !important;
+    margin-top: auto;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.15) !important;
+  }
+
+  /* Bottom drag handle indicator */
+  .modal-card::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+
+  .modal-header {
+    padding: 0.65rem 1rem 0.75rem !important;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .modal-title {
+    font-size: 1rem !important;
+  }
+
+  .modal-body {
+    padding: 0.85rem 1rem !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 50 !important;
+    background: var(--bg-surface) !important;
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px)) 1rem !important;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.07);
+    border-top: 1px solid var(--border-color);
+    display: flex !important;
+    gap: 0.5rem !important;
+  }
+
+  .modal-footer .btn {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-radius: var(--radius-md);
+  }
+
+  /* ── Form layout ── */
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  /* ── Daytype toggle buttons ── */
+  .daytype-btn {
+    font-size: 0.78rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  /* ── Mobile data cards (orders / contacts) ── */
+  .mobile-data-card {
+    border-radius: var(--radius-md);
+  }
+
+    /* ── Kitchen grid ── */
+  .kitchen-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  /* Hide text labels on mobile header buttons (icon/logo only display) */
+  .header-actions .btn span {
+    display: none !important;
+  }
+
+  .header-actions .btn {
+    padding: 0.35rem 0.55rem !important;
+    min-width: 40px;
+    min-height: 40px;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+
+  /* Hide food name on mobile meal date selection cards */
+  .order-date-cards-grid .date-select-food {
+    display: none !important;
+  }
+
+  /* ── Add Order Modal Mobile Layout ── */
+  .order-modal-card {
+    max-width: 100% !important;
+    max-height: 92vh !important;
+  }
+
+  .order-modal-body {
+    padding: 0.75rem 0.9rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .order-date-cards-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 0.3rem !important;
+  }
+
+  .date-select-card {
+    padding: 0.3rem 0.15rem !important;
+  }
+
+  .date-select-day {
+    font-size: 0.62rem !important;
+    padding: 0.08rem 0.3rem !important;
+  }
+
+  .date-select-date {
+    font-size: 0.72rem !important;
+    margin-top: 0.15rem !important;
+  }
+
+  .portion-radio-group {
+    gap: 0.5rem !important;
+  }
+
+  .portion-radio-btn {
+    padding: 0.55rem 0.65rem !important;
+    gap: 0.45rem !important;
+  }
+
+  .addon-grid {
+    gap: 0.4rem !important;
+  }
+
+  .addon-toggle-btn {
+    padding: 0.45rem 0.25rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .addon-btn-label {
+    font-size: 0.78rem !important;
+  }
+
+  .addon-price-tag {
+    font-size: 0.68rem !important;
+    padding: 1px 4px !important;
+  }
+
+  .payment-radio-group {
+    gap: 0.4rem !important;
+  }
+
+  .payment-radio-card {
+    padding: 0.55rem 0.3rem !important;
+  }
+
+  .payment-radio-title {
+    font-size: 0.78rem !important;
+  }
+
+  .order-total-box {
+    font-size: 0.82rem !important;
+    padding: 0 0.35rem !important;
+  }
+
+  .order-address-options-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  /* ── Touch targets: card action buttons were only ~28px tall, which makes
+     taps feel unresponsive (you miss the icon and nothing happens) ── */
+  .mobile-data-card .btn-sm {
+    min-height: 38px;
+    min-width: 38px;
+    padding: 0.3rem 0.5rem !important;
+    touch-action: manipulation;
+  }
+
+  .mobile-data-card .badge {
+    min-height: 30px;
+    padding: 0.25rem 0.6rem;
+  }
+
+  .dash-mobile-tab-btn,
+  .filter-pill,
+  .daytype-btn,
+  .bottom-nav-item {
+    touch-action: manipulation;
+  }
+}
+
+/* ═══════════════════════════════════════
+   DARK MODE MOBILE FIXES
+═══════════════════════════════════════ */
+@media (max-width: 600px) {
+  [data-theme="dark"] .modal-footer {
+    background: var(--bg-surface) !important;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.4) !important;
+  }
+
+  [data-theme="dark"] .bottom-nav {
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+  }
+
+  [data-theme="dark"] .bottom-nav-item.active {
+    background: var(--primary-light);
+  }
+}
